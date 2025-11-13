@@ -1,4 +1,5 @@
-﻿using EComerce.Shared.DTOS.ProductDtos;
+﻿using EComerce.Shared;
+using EComerce.Shared.DTOS.ProductDtos;
 using ECommerce.ServiceAbstraction;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -22,9 +23,9 @@ namespace ECommerce.Presentation.Controllers
         }
         #region GetAllProduct
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetAllProduct()
+        public async Task<ActionResult<PaginatedResult<ProductDTO>>> GetAllProduct([FromQuery]ProductQueryParams queryParams)
         {
-            var Products = await  _productService.GetAllProductsAsync();
+            var Products = await  _productService.GetAllProductsAsync(queryParams);
             return Ok(Products);
 
         }
