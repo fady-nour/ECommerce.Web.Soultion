@@ -4,23 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ECommerce.Domain.Entities.ProductModule
+namespace EComerce.Shared.DTOS.ProductDtos
 {
-    public class Product : BaseEntity<int>
+    public class ProductDTO
     {
- 
+        public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string PictureUrl { get; set; } = null!;
         public decimal Price { get; set; }
-
-        #region RelationShips
-        public int BrandId { get; set; }
-        public ProductBrand ProductBrands { get; set; }
-        public int TypeId { get; set; }
-        public ProductType ProductTypes { get; set; } 
-
-        #endregion
-
+        public string ProductBrand { get; set; } = null!;
+        public string ProductType { get; set; } = null!;
     }
 }
