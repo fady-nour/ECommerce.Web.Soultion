@@ -4,6 +4,7 @@ using EComerce.Shared.DTOS.ProductDtos;
 using ECommerce.Domain.Contracts;
 using ECommerce.Domain.Entities.ProductModule;
 using ECommerce.ServiceAbstraction;
+using ECommerce.Services.Exceptions;
 using ECommerce.Services.Specification;
 using System;
 using System.Collections.Generic;
@@ -52,6 +53,12 @@ namespace ECommerce.Services
         {
             var spc = new ProductWithBrandTypeSpecification(id);
             var Product = await _unitOfWork.GetRepositoryAsync<Product,int>().GetByIdAsync(spc);
+            if(Product == null)
+            {
+                throw new ProductNotFoundException(id);
+              
+            }
+            
             return _mapper.Map<ProductDTO>(Product);
         }
     }
