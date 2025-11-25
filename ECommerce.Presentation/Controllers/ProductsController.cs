@@ -2,6 +2,7 @@
 using EComerce.Shared.DTOS.ProductDtos;
 using ECommerce.Presentation.Attributes;
 using ECommerce.ServiceAbstraction;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace ECommerce.Presentation.Controllers
 {
     [ApiController]
     [Route("api/[Controller]")]
-    public class ProductsController :ControllerBase
+    public class ProductsController : ApiBaseController
     {
         private readonly IProductService _productService;
 
@@ -38,9 +39,9 @@ namespace ECommerce.Presentation.Controllers
         public async Task<ActionResult<ProductDTO>> GetProductById(int id)
         {
            
-                var Product = await _productService.GetProductByIdAsync(id);
-                if (Product is null) return NotFound($"No Propduct With Id : {id} Found");
-                return Ok(Product);
+                var Result = await _productService.GetProductByIdAsync(id);
+
+            return HandleResult<ProductDTO>(Result);
          
 
         }
