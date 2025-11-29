@@ -41,10 +41,11 @@ namespace ECommerce.Persistence.Data.Repositories
            
         }
 
-        public Task<TEntity?> GetByIdAsync(Tkey id)
+        public async Task<TEntity?> GetByIdAsync(Tkey id)
         {
-            throw new NotImplementedException();
+            return await _dbContext.Set<TEntity>().FindAsync(id);
         }
+       
 
         public async Task<TEntity?> GetByIdAsync(ISpecification<TEntity, Tkey> specification)
         {

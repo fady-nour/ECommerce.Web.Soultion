@@ -11,10 +11,13 @@ using ECommerce.Services.MappingProfiles;
 using ECommerce.Web.CustomMiddlWares;
 using ECommerce.Web.Extensions;
 using ECommerce.Web.Factories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ECommerce.Web
@@ -40,12 +43,13 @@ namespace ECommerce.Web
             builder.Services.AddKeyedScoped<IDataInitialize, IdentityDataIntializer>("Identity");
             builder.Services.AddScoped<IUnitOfWork,UnitOfWork>();
             builder.Services.AddAutoMapper(p => p.AddProfile<ProductProfile>());
-         
+            builder.Services.AddAutoMapper(p => p.AddProfile<BasketProfile>());
+            builder.Services.AddAutoMapper(p => p.AddProfile<OrderProfile>());
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddSingleton<IConnectionMultiplexer>(O => 
             { return ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("RedisConnection")!); });
               builder.Services.AddScoped<IBasketRepository, BasketRepository>();
-            builder.Services.AddAutoMapper(p => p.AddProfile<BasketProfile>());
+          
             builder.Services.AddScoped<IBasketService, BasketService>();
             builder.Services.AddScoped<ICacheRepository, CacheRepository>();
             builder.Services.AddScoped<ICacheService, CacheService>();
@@ -57,15 +61,30 @@ namespace ECommerce.Web
             builder.Services.AddDbContext<StoreIdentityDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
-                //Add-Migration "IdentityTablesCreate" -OutDir "IdentityData/Migrations" -Context "StoredIdentityDbcontext"
+              
             });
-            //builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-            //    .AddEntityFrameworkStores<StoreIdentityDbContext>();
+
 
             builder.Services.AddIdentityCore<ApplicationUser>()
                 .AddRoles<IdentityRole>().AddEntityFrameworkStores<StoreIdentityDbContext>();
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-
+            builder.Services.AddAuthentication(Options =>
+            {
+                Options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                Options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(Options => {
+                Options.SaveToken = true;
+            Options.TokenValidationParameters = new TokenValidationParameters()
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidIssuer = builder.Configuration["JWTOptions:Issuer"],
+                ValidAudience = builder.Configuration["JWTOptions:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(builder.Configuration["JWTOptions:SecretKey"]!)),
+            };
+            });
+            builder.Services.AddScoped<IOrderService, OrderService>();
             var app = builder.Build();
 
             #region DataSeeding
@@ -86,7 +105,7 @@ namespace ECommerce.Web
             }
 
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

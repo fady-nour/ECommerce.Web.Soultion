@@ -6,6 +6,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,6 +30,10 @@ namespace ECommerce.Presentation.Controllers
                 return Ok(result.Value);
             else 
                 return HandleProblem(result.Errors);
+        }
+        protected string GetEmailFromToken()
+        {
+            return User.FindFirstValue(ClaimTypes.Email)!;
         }
         private ActionResult HandleProblem(IReadOnlyList<Error> errors)
         {
