@@ -36,12 +36,12 @@ namespace ECommerce.Services
             List<OrderItem> OrderItems = new List<OrderItem>();
             foreach (var item in Basket.Items)
             {
-                var Product = await _unitOfWork.GetRepository<Product, int>().GetByIdAsync(item.Id);
+                var Product = await _unitOfWork.GetRepositoryAsync<Product, int>().GetByIdAsync(item.Id);
                 if (Product == null) return Error.NotFound($"Product with id {item.Id} not found!");
                 OrderItems.Add(CrateOrderItem(item, Product));
 
             }
-            var DeliveryMethod = await _unitOfWork.GetRepository<DeliveryMethod, int>().GetByIdAsync(orderDTO.DeliveryMethodId);
+            var DeliveryMethod = await _unitOfWork.GetRepositoryAsync<DeliveryMethod, int>().GetByIdAsync(orderDTO.DeliveryMethodId);
             if(DeliveryMethod is null)
             return Error.NotFound($"Delivery Method with id {orderDTO.DeliveryMethodId} not found!");
             var Subtotal = OrderItems.Sum(item => item.Price * item.Quantity);
@@ -54,7 +54,7 @@ namespace ECommerce.Services
                 Items = OrderItems,
 
             };
-            await _unitOfWork.GetRepository<Order,Guid>().AddAsync(Order);
+            await _unitOfWork.GetRepositoryAsync<Order,Guid>().AddAsync(Order);
            int Result = await _unitOfWork.SaveChangeAsync();
             if(Result == 0) return Error.Failure("Failed to create order!");
            return _mapper.Map<OrderToReturnDTO>(Order);
@@ -78,7 +78,7 @@ namespace ECommerce.Services
         public async Task<Result<IEnumerable<OrderToReturnDTO>>> GetAllOrdersAsync(string Email)
         {
             var Spec =new OrderSpecification(Email);
-            var Orders = await _unitOfWork.GetRepository<Order, Guid>().GetAllAsync(Spec);
+            var Orders = await _unitOfWork.GetRepositoryAsync<Order, Guid>().GetAllAsync(Spec);
             if(!Orders.Any())
             {
                 return Error.NotFound("No orders found for this user!");
@@ -89,7 +89,7 @@ namespace ECommerce.Services
 
         public async Task<Result<IEnumerable<DeliveryMethodDTO>>> GetDeliveryMethods()
         {
-          var DeliveryMethods = await _unitOfWork.GetRepository<DeliveryMethod, int>().GetAllAsync();
+          var DeliveryMethods = await _unitOfWork.GetRepositoryAsync<DeliveryMethod, int>().GetAllAsync();
           if (!DeliveryMethods.Any())
           {
               return Error.NotFound("No delivery methods found!");
@@ -102,7 +102,7 @@ namespace ECommerce.Services
         public async Task<Result<OrderToReturnDTO>> GetOrderByIdAsync(Guid id, string Email)
         {
             var Spec = new OrderSpecification(id, Email);
-            var Order = await _unitOfWork.GetRepository<Order, Guid>().GetByIdAsync(Spec);
+            var Order = await _unitOfWork.GetRepositoryAsync<Order, Guid>().GetByIdAsync(Spec);
             if (Order == null)
             {
                 return Error.NotFound("Order not found!");

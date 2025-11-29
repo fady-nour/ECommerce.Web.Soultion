@@ -28,7 +28,7 @@ namespace ECommerce.Services
 
         public async Task<IEnumerable<BrandDTO>> GetAllBrandsAsync()
         {
-           var Brands = await _unitOfWork.GetRepository<ProductBrand,int>().GetAllAsync();  
+           var Brands = await _unitOfWork.GetRepositoryAsync<ProductBrand,int>().GetAllAsync();  
             return _mapper.Map<IEnumerable<BrandDTO>>(Brands);
         }
 
@@ -36,24 +36,24 @@ namespace ECommerce.Services
         {
             
            var spc = new ProductWithBrandTypeSpecification(queryParams);
-            var Products = await _unitOfWork.GetRepository<Product,int>().GetAllAsync(spc);
+            var Products = await _unitOfWork.GetRepositoryAsync<Product,int>().GetAllAsync(spc);
             var DataToReturn= _mapper.Map<IEnumerable<ProductDTO>>(Products);
             var CounToReturn = DataToReturn.Count();
             var CountSpec = new ProductCountSpecification(queryParams);
-            var countOfProducts = await _unitOfWork.GetRepository<Product,int>().CountAsync(CountSpec);
+            var countOfProducts = await _unitOfWork.GetRepositoryAsync<Product,int>().CountAsync(CountSpec);
             return new PaginatedResult<ProductDTO>(queryParams.PageIndex, CounToReturn, countOfProducts, DataToReturn);
         }
 
         public async Task<IEnumerable<TypeDTO>> GetAllTypesAsync()
         {
-            var Types= await _unitOfWork.GetRepository<ProductType,int>().GetAllAsync();
+            var Types= await _unitOfWork.GetRepositoryAsync<ProductType,int>().GetAllAsync();
             return _mapper.Map<IEnumerable<TypeDTO>>(Types);
         }
 
         public async Task<Result<ProductDTO>> GetProductByIdAsync(int id)
         {
             var spc = new ProductWithBrandTypeSpecification(id);
-            var Product = await _unitOfWork.GetRepository<Product,int>().GetByIdAsync(spc);
+            var Product = await _unitOfWork.GetRepositoryAsync<Product,int>().GetByIdAsync(spc);
             if (Product == null)
                 return Error.NotFound();
             
