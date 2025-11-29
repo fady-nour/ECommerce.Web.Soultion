@@ -30,6 +30,10 @@ namespace ECommerce.Presentation.Controllers
             else 
                 return HandleProblem(result.Errors);
         }
+        protected string GetEmailFromToken()
+        {
+            return User.FindFirstValue(ClaimTypes.Email)!;
+        }
         private ActionResult HandleProblem(IReadOnlyList<Error> errors)
         {
             //if no errors => return default error 

@@ -3,6 +3,7 @@ using EComerce.Shared.DTOS.ProductDtos;
 using ECommerce.Presentation.Attributes;
 using ECommerce.ServiceAbstraction;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace ECommerce.Presentation.Controllers
             _productService = productService;
         }
         #region GetAllProduct
+        [Authorize]
         [HttpGet]
         [RedisCache]
         public async Task<ActionResult<PaginatedResult<ProductDTO>>> GetAllProduct([FromQuery]ProductQueryParams queryParams)
